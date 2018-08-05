@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kana>
+    <katakana>
+        <a>あいうえお</a>
+        <ka>かきくけこ</ka>
+        <sa>さしすせそ</sa>
+        <ta>たちつてと</ta>
+        <na>なにぬねの</na>
+        <ha>はひふへほ</ha>
+        <ma>まみむめも</ma>
+        <ya>やゆよ</ya>
+        <ra>らりるれろ</ra>
+        <wa>わを</wa>
+        <n>ん</n>
+    </katakana>
+    <hiragana>
+        <a>アイウエオ</a>
+        <ka>カキクケコ</ka>
+        <sa>サシスセソ</sa>
+        <ta>タチツテト</ta>
+        <na>ナニヌネノ</na>
+        <ha>ハヒフヘホ</ha>
+        <ma>マミムメモ</ma>
+        <ya>ヤユヨ</ya>
+        <ra>ラリルレロ</ra>
+        <wa>ワヲ</wa>
+        <n>ン</n>
+        </hiragana>
+</kana>
