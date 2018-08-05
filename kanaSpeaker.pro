@@ -26,15 +26,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         frmspeakermainwindow.cpp \
-    settingwidget.cpp
+        settingdialog.cpp
+    #settingwidget.cpp \
+
 
 HEADERS += \
         frmspeakermainwindow.h \
-    settingwidget.h
+        settingdialog.h
+    #settingwidget.h \
+
 
 FORMS += \
         frmspeakermainwindow.ui \
-    settingwidget.ui
+    settingdialog.ui
+    #settingwidget.ui \
+
 
 RESOURCES += \
     kanares.qrc

@@ -1,12 +1,11 @@
-#include "settingwidget.h"
-#include "ui_settingwidget.h"
+#include "settingdialog.h"
+#include "ui_settingdialog.h"
 
-SettingWidget::SettingWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::SettingWidget)
+SettingDialog::SettingDialog(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::SettingDialog)
 {
     ui->setupUi(this);
-    this->setWindowFlags(Qt::Dialog);
     this->setWindowModality(Qt::WindowModal);
     ui->cbRangeState->addItem("片假名");
     ui->cbRangeState->addItem("平假名");
@@ -18,12 +17,12 @@ SettingWidget::SettingWidget(QWidget *parent) :
     connect(ui->btnBack,SIGNAL(released()),this,SLOT(hide()));
 }
 
-SettingWidget::~SettingWidget()
+SettingDialog::~SettingDialog()
 {
     delete ui;
 }
 
-RangeState SettingWidget::getRangeState()
+RangeState SettingDialog::getRangeState()
 {
     int index = ui->cbRangeState->currentIndex();
     switch (index ) {
@@ -38,12 +37,12 @@ RangeState SettingWidget::getRangeState()
     }
 }
 
-qint8 SettingWidget::getTimeStep()
+qint8 SettingDialog::getTimeStep()
 {
     return ui->hsTimeStep->value();
 }
 
-void SettingWidget::updateTimeLabel()
+void SettingDialog::updateTimeLabel()
 {
     ui->lbTimeValue->setText(QString("%1秒").arg(ui->hsTimeStep->value()));
 }

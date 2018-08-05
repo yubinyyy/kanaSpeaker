@@ -18,6 +18,8 @@ FrmSpeakerMainWindow::FrmSpeakerMainWindow(QWidget *parent) :
     ui(new Ui::FrmSpeakerMainWindow)
 {
     ui->setupUi(this);
+    mSettingDialog = new SettingDialog(this);
+
 
     QFont defaultFont;
     defaultFont.setFamily("Hiragino Mincho ProN");
@@ -51,11 +53,14 @@ FrmSpeakerMainWindow::FrmSpeakerMainWindow(QWidget *parent) :
     QDomElement root = domDocument.documentElement();
     readXML(&root);
 
-    connect(ui->randomBtn,SIGNAL(released()),this,SLOT(randomKana()));
+    connect(ui->randomBtn,SIGNAL(released()),this, SLOT(startTimer()));
+    connect(&this->mTimer, SIGNAL(timeout()), this, SLOT(randomKana()));
+    connect(ui->btnPreferences,SIGNAL(released()),this,SLOT(showPreferencesWidget()));
 }
 
 FrmSpeakerMainWindow::~FrmSpeakerMainWindow()
 {
+    delete mSettingDialog;
     delete ui;
 }
 
@@ -124,4 +129,17 @@ void FrmSpeakerMainWindow::randomKana()
    }
 
    ui->blackboard->repaint();
+}
+
+void FrmSpeakerMainWindow::showPreferencesWidget()
+{
+    mSettingDialog->exec();
+    mTimer.setInterval(mSettingDialog->getTimeStep() * 1000);
+}
+
+void FrmSpeakerMainWindow::startTimer()
+{
+    mTimer.stop();
+    mTimer.setInterval(mSettingDialog->getTimeStep() * 1000);
+    mTimer.start();
 }

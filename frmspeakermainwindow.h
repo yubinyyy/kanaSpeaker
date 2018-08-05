@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QDomNode>
+#include <QTimer>
+#include "settingdialog.h"
 
 namespace Ui {
 class FrmSpeakerMainWindow;
@@ -17,10 +19,14 @@ public:
     ~FrmSpeakerMainWindow();
 
 public slots:
+    void startTimer();
     void randomKana();
+    void showPreferencesWidget();
 private:
     QVector<QChar> mKatakanaVec;
     QVector<QChar> mHiraganaVec;
+    SettingDialog *mSettingDialog;
+    QTimer mTimer;
 
     void readXML(QDomNode *domNode);
     Ui::FrmSpeakerMainWindow *ui;
