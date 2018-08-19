@@ -27,6 +27,8 @@ public:
 public slots:
     void updateTimeLabel();
 private:
+
+
     Ui::SettingDialog *ui;
 };
 

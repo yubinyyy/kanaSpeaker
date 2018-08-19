@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QDomNode>
 #include <QTimer>
+#include <vector>
 #include "settingdialog.h"
 
 namespace Ui {
@@ -20,13 +21,19 @@ public:
 
 public slots:
     void startTimer();
-    void randomKana();
+    void initKanaVec();
+    void raddomKana();
+    void reset();
     void showPreferencesWidget();
 private:
-    QVector<QChar> mKatakanaVec;
-    QVector<QChar> mHiraganaVec;
+    std::vector<QChar> mKatakanaVec;
+    std::vector<QChar> mHiraganaVec;
+    std::vector<int> mIndexVec;
     SettingDialog *mSettingDialog;
     QTimer mTimer;
+
+    RangeState mCurrentRangeState;
+    qint8 mCurrentTimeStep;
 
     void readXML(QDomNode *domNode);
     Ui::FrmSpeakerMainWindow *ui;

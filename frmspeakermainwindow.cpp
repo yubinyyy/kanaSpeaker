@@ -9,9 +9,12 @@
 #include <QDomElement>
 #include <QRandomGenerator>
 
-static inline QString titleElement() { return QStringLiteral("title"); }
-static inline QString folderElement() { return QStringLiteral("folder"); }
-static inline QString bookmarkElement() { return QStringLiteral("bookmark"); }
+using namespace std;
+
+//static inline QString titleElement() { return QStringLiteral("title"); }
+//static inline QString folderElement() { return QStringLiteral("folder"); }
+//static inline QString bookmarkElement() { return QStringLiteral("bookmark"); }
+static unsigned long vecIndex = 0;
 
 FrmSpeakerMainWindow::FrmSpeakerMainWindow(QWidget *parent) :
     QWidget(parent),
@@ -20,6 +23,8 @@ FrmSpeakerMainWindow::FrmSpeakerMainWindow(QWidget *parent) :
     ui->setupUi(this);
     mSettingDialog = new SettingDialog(this);
 
+    mCurrentRangeState =  mSettingDialog->getRangeState();
+    mCurrentTimeStep   = mSettingDialog->getTimeStep();
 
     QFont defaultFont;
     defaultFont.setFamily("Hiragino Mincho ProN");
@@ -52,9 +57,12 @@ FrmSpeakerMainWindow::FrmSpeakerMainWindow(QWidget *parent) :
 
     QDomElement root = domDocument.documentElement();
     readXML(&root);
+    initKanaVec();
 
     connect(ui->randomBtn,SIGNAL(released()),this, SLOT(startTimer()));
-    connect(&this->mTimer, SIGNAL(timeout()), this, SLOT(randomKana()));
+    connect(&this->mTimer, SIGNAL(timeout()), this, SLOT(raddomKana()));
+    //connect(ui->pauseBtn,SIGNAL(released()),this, SLOT(pause()));
+    connect(ui->resetBtn, SIGNAL(released()), this, SLOT(reset()));
     connect(ui->btnPreferences,SIGNAL(released()),this,SLOT(showPreferencesWidget()));
 }
 
@@ -64,7 +72,12 @@ FrmSpeakerMainWindow::~FrmSpeakerMainWindow()
     delete ui;
 }
 
-
+void FrmSpeakerMainWindow::reset()
+{
+    mTimer.stop();
+    ui->blackboard->setText("");
+    ui->blackboard->repaint();
+}
 void FrmSpeakerMainWindow::readXML(QDomNode *domNode)
 {
     QDomNodeList childNodeList = domNode->childNodes();
@@ -105,36 +118,101 @@ void FrmSpeakerMainWindow::readXML(QDomNode *domNode)
     }
 }
 
-
-void FrmSpeakerMainWindow::randomKana()
+void FrmSpeakerMainWindow::raddomKana()
 {
-   int count = mKatakanaVec.count() + mHiraganaVec.count();
-   if(count <= 0)
-   {
-       return;
-   }
-   int index = rand()%(count+1);
-   //QDebug(QtDebugMsg)<<"random index:"<<index;
-   QChar kana;
-   if(index < mKatakanaVec.count())
-   {
-        kana = mKatakanaVec[index];
-        ui->blackboard->setText(kana);
+    if(vecIndex < mIndexVec.size())
+    {
+        int index = mIndexVec[vecIndex];
 
-   }
-   else
-   {
-        kana = mHiraganaVec[count - index];
-        ui->blackboard->setText(kana);
-   }
+        if(index < mKatakanaVec.size())
+        {
+            ui->blackboard->setText(mKatakanaVec[index]);
+        }
+        else
+        {
+            ui->blackboard->setText(mHiraganaVec[index - mKatakanaVec.size()]);
+        }
 
-   ui->blackboard->repaint();
+        ui->blackboard->repaint();
+        vecIndex++;
+    }
+    else
+    {
+        mTimer.stop();
+    }
+}
+
+void FrmSpeakerMainWindow::initKanaVec()
+{
+    mIndexVec.clear();
+    int count = 0;
+    switch (mCurrentRangeState)
+    {
+        case KATAKANA:
+            count = mKatakanaVec.size();
+            break;
+        case HIRAGANA:
+            count = mHiraganaVec.size();
+            break;
+        case FIFTY:
+            count = mKatakanaVec.size() + mHiraganaVec.size();
+            break;
+     }
+     for(int i = 0; i < count; i++)
+     {
+         mIndexVec.push_back(i);
+     }
+     random_shuffle(mIndexVec.begin(),mIndexVec.end());
+     vecIndex = 0;
+//    default:
+//        mLetterVec.insert(mLetterVec.cend(), mKatakanaVec.begin(),mKatakanaVec.end());
+//        mLetterVec.insert(mLetterVec.cend(), mHiraganaVec.begin(),mHiraganaVec.end());
+//        break;
+
+    //mLetterVec.insert(mLetterVec.cend(), mKatakanaVec.begin(),mKatakanaVec.end());
+//   int count = mKatakanaVec.size() + mHiraganaVec.size();
+//   if(count <= 0)
+//   {
+//       return;
+//   }
+//   int index = rand()%(count+1);
+//   //QDebug(QtDebugMsg)<<"random index:"<<index;
+//   QChar kana;
+//   if(index < mKatakanaVec.size())
+//   {
+//        kana = mKatakanaVec[index];
+//        ui->blackboard->setText(kana);
+
+//   }
+//   else
+//   {
+//        kana = mHiraganaVec[count - index];
+//        ui->blackboard->setText(kana);
+//   }
+
+//   ui->blackboard->repaint();
 }
 
 void FrmSpeakerMainWindow::showPreferencesWidget()
 {
     mSettingDialog->exec();
-    mTimer.setInterval(mSettingDialog->getTimeStep() * 1000);
+
+    RangeState rangeState = mSettingDialog->getRangeState();
+    qint8 timeStep        = mSettingDialog->getTimeStep();
+
+    if(rangeState != mCurrentRangeState)
+    {
+        mCurrentRangeState = rangeState;
+        initKanaVec();
+    }
+
+    if(timeStep != mCurrentTimeStep)
+    {
+        mCurrentTimeStep = timeStep;
+        mTimer.setInterval(mCurrentTimeStep * 1000);
+    }
+
+
 }
 
 void FrmSpeakerMainWindow::startTimer()
